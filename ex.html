@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analog Clock with IST</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #2c3e50;
+        }
+
+        .clock {
+            width: 250px;
+            height: 250px;
+            background-color: white;
+            border-radius: 50%;
+            position: relative;
+            border: 5px solid #ecf0f1;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .markings {
+            position: absolute;
+            font-size: 20px;
+            font-weight: bold;
+            color: black;
+            font-family: Arial, sans-serif;
+        }
+
+        .twelve { top: 10px; left: 50%; transform: translateX(-50%); }
+        .three { right: 10px; top: 50%; transform: translateY(-50%); }
+        .six { bottom: 10px; left: 50%; transform: translateX(-50%); }
+        .nine { left: 10px; top: 50%; transform: translateY(-50%); }
+
+        /* Minute Markers */
+        .marker {
+            position: absolute;
+            width: 2px;
+            height: 8px;
+            background: black;
+            transform-origin: 50% 100%;
+        }
+
+        .long-marker {
+            height: 12px;
+        }
+
+        .hand {
+            position: absolute;
+            width: 50%;
+            height: 3px;
+            background: black;
+            top: 50%;
+            left: 50%;
+            transform-origin: 0% 50%;
+            transform: rotate(90deg);
+            transition-timing-function: steps(1, end);
+        }
+
+        .hour {
+            width: 30%;
+            height: 6px;
+            background: black;
+        }
+
+        .minute {
+            width: 40%;
+            height: 4px;
+            background: black;
+        }
+
+        .second {
+            width: 45%;
+            height: 2px;
+            background: red;
+        }
+
+        .center-dot {
+            width: 10px;
+            height: 10px;
+            background: black;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body>
+    <div class="clock" id="clock">
+        <div class="markings twelve">12</div>
+        <div class="markings three">3</div>
+        <div class="markings six">6</div>
+        <div class="markings nine">9</div>
+
+        <div class="hand hour" id="hour"></div>
+        <div class="hand minute" id="minute"></div>
+        <div class="hand second" id="second"></div>
+
+        <div class="center-dot"></div>
+    </div>
+
+    <script>
+        function createMarkers() {
+            const clock = document.getElementById("clock");
+            for (let i = 0; i < 60; i++) {
+                const marker = document.createElement("div");
+                marker.classList.add("marker");
+                if (i % 5 === 0) {
+                    marker.classList.add("long-marker");
+                }
+                const angle = i * 6;
+                const radius = 112;
+                const x = 119 + radius * Math.cos((angle - 90) * Math.PI / 180);
+                const y = 115 + radius * Math.sin((angle - 90) * Math.PI / 180);
+                marker.style.left = `${x}px`;
+                marker.style.top = `${y}px`;
+                marker.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
+                clock.appendChild(marker);
+            }
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const options = { timeZone: 'Asia/Kolkata', hour12: true, hour: 'numeric', minute: 'numeric', second: 'numeric' };
+            const timeString = now.toLocaleTimeString('en-US', options);
+            const [time, period] = timeString.split(' ');
+            const [hours, minutes, seconds] = time.split(':').map(Number);
+
+            const hourDeg = (hours * 30) + (minutes * 0.5);
+            const minuteDeg = (minutes * 6) + (seconds * 0.1);
+            const secondDeg = seconds * 6;
+
+            document.getElementById("hour").style.transform = `rotate(${90 + hourDeg}deg)`;
+            document.getElementById("minute").style.transform = `rotate(${90 + minuteDeg}deg)`;
+            document.getElementById("second").style.transform = `rotate(${90 + secondDeg}deg)`;
+        }
+
+        createMarkers();
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
+</body>
+</html>
